@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "The Utility Filter",
-  "version": "2.0.0",
+  "version": "4.0.0",
   "description": "Identifies high-utility, expert-led YouTube content while filtering AI slop and subscriber churn.",
   "permissions": ["storage"],
   "host_permissions": [

@@ -12,10 +12,11 @@
   // ═══════════════════════════════════════════
 
   const WEIGHTS = {
-    approval: 0.55,
+    approval: 0.45,      // Reduced to balance with volume
     velocity: 0.25,
     integrity: 0.15,
-    clickbait: 0.05,
+    volume: 0.10,        // NEW: Absolute engagement magnitude (favors high likes over high ratio)
+    clickbait: 0.025,    // Halved from 0.05
   };
 
   const CONFIG = {
@@ -35,6 +36,18 @@
 
     // ── Integrity (engagement authenticity) ──
     INTEGRITY_TARGET: 0.03,  // 3% interaction rate = full credit
+
+    // ── Volume Factor (absolute engagement magnitude) ──
+    // Distinguishes 10,000 likes from 100 likes even at same ratio
+    VOLUME_BREAKPOINT_LOW: 100,      // Below this: minimal volume credit
+    VOLUME_BREAKPOINT_MID: 1000,     // Mid-tier engagement
+    VOLUME_BREAKPOINT_HIGH: 10000,   // High engagement threshold
+    VOLUME_DECAY_RATE: 0.3,          // Logarithmic scaling steepness
+
+    // ── Engagement Velocity (recency × engagement rate) ──
+    // Favors fresh, rapidly engaging content
+    VELOCITY_DAYS_OPTIMAL: 7,        // Peak velocity window (1 week)
+    VELOCITY_DAYS_PENALTY: 365,      // Old content decay threshold
 
     // ── Temporal Decay ──
     DECAY_RATE: 0.95,        // 5% annual decay
@@ -72,17 +85,26 @@
   let currentVideoId = null;
 
   // ═══════════════════════════════════════════
-  //  SCORING MODEL: Pareto Utility 3.2
+  //  SCORING MODEL: Pareto Utility 4.0
   //
-  //  1. Bayesian approval → rescaled to [0,1] using real-world distribution
-  //  2. Velocity (log V/S) → [0,1]
-  //  3. Integrity (engagement rate ramp) → [0,1]
-  //  4. Clickbait (title heuristic) → [0,1] subtractive
+  //  COMPONENTS (0-1 normalized):
+  //  1. Approval (A): Bayesian like ratio → rescaled to YouTube distribution
+  //  2. Volume (V): Absolute engagement magnitude (log-scaled by likes count)
+  //  3. Velocity (Γ): View/subscriber ratio + engagement velocity + recency bonus
+  //  4. Integrity (I): Engagement rate ramp (catches bot views)
+  //  5. Clickbait (C): Title heuristic (subtractive)
   //
-  //  composite = W_a·A + W_v·Γ + W_i·I - W_c·C
+  //  FORMULA:
+  //  composite = W_a·A + W_v·V + W_γ·Γ + W_i·I - W_c·C
   //  score = composite × decay × 100
   //
-  //  No sigmoid — rescaled approval provides natural spread.
+  //  KEY IMPROVEMENTS:
+  //  - Volume factor: 10,000 likes outweighs 100 likes even at same ratio
+  //  - Engagement velocity: (likes+dislikes)/(views×days) favors rapid engagement
+  //  - Recency bonus: Fresh content (<7 days) gets up to 20% boost
+  //  - Clickbait weight halved: reduced from 0.05 to 0.025
+  //
+  //  No sigmoid — rescaled approval + volume provides natural spread.
   // ═══════════════════════════════════════════
 
   function computeScore({ likes, dislikes, viewCount, subscribers, daysOld, title }) {
@@ -92,20 +114,36 @@
     const S = Math.max(subscribers, 1);
     const Veff = L + D;
 
-    // ── Component A: Approval ──
+    // ── Component A: Approval (ratio quality) ──
     // Bayesian smoothed ratio
     const alpha = (L + 1) / (L + D + 2);
     const bayesian = (alpha * Veff + CONFIG.K * CONFIG.MU) / (Veff + CONFIG.K);
 
     // Rescale to real-world distribution
-    // Maps [FLOOR..CEILING] → [0..1], clamped
     const range = CONFIG.APPROVAL_CEILING - CONFIG.APPROVAL_FLOOR;
     const A = Math.min(Math.max((bayesian - CONFIG.APPROVAL_FLOOR) / range, 0), 1);
 
-    // ── Component Γ: Velocity ──
+    // ── Component V: Volume (absolute engagement magnitude) ──
+    // Logarithmic scaling: favors 10,000 likes over 100 likes even at same ratio
+    // Uses likes specifically (not total votes) as primary signal of positive engagement
+    const volumeRaw = Math.log(1 + L) / Math.log(1 + CONFIG.VOLUME_BREAKPOINT_HIGH);
+    const volumeScore = Math.min(Math.max(volumeRaw, 0), 1.0);
+
+    // ── Component Γ: Velocity (view/subscriber ratio + engagement velocity) ──
     const rawRatio = V / S;
-    const gammaRaw = Math.log(1 + rawRatio) / Math.log(1 + CONFIG.VELOCITY_REF);
-    const gamma = Math.min(Math.max(gammaRaw, 0), 1.0);
+    const gammaBase = Math.log(1 + rawRatio) / Math.log(1 + CONFIG.VELOCITY_REF);
+    
+    // Engagement velocity: (likes+dislikes) / (views × days_old)
+    // Higher = rapid engagement on fresh content
+    const ageInDays = Math.max(daysOld, 0.1); // Prevent division by zero
+    const engagementVelocity = (Veff / V) / ageInDays;
+    
+    // Recency multiplier: peaks at 1 week, decays after
+    const recencyBonus = daysOld <= CONFIG.VELOCITY_DAYS_OPTIMAL 
+      ? 1.0 + (0.2 * (1 - daysOld / CONFIG.VELOCITY_DAYS_OPTIMAL)) // Up to 20% boost for very fresh
+      : 1.0 / (1 + Math.log(1 + daysOld / CONFIG.VELOCITY_DAYS_PENALTY));
+    
+    const gamma = Math.min(Math.max(gammaBase * recencyBonus, 0), 1.0);
 
     // ── Component I: Integrity ──
     const interactionRate = V > 0 ? Veff / V : 0;
@@ -118,6 +156,7 @@
     let composite = WEIGHTS.approval * A
                   + WEIGHTS.velocity * gamma
                   + WEIGHTS.integrity * I
+                  + WEIGHTS.volume * volumeScore
                   - WEIGHTS.clickbait * C;
     composite = Math.min(Math.max(composite, 0), 1);
 
@@ -151,7 +190,11 @@
       confidence,
       clickbaitScore: C,
       interactionDensity: (interactionRate * 100).toFixed(2),
-      raw: { A, bayesian, gamma, I, C, composite, decay, ratio: rawRatio, Veff },
+      raw: { 
+        A, bayesian, gamma, I, C, 
+        volumeScore, engagementVelocity, recencyBonus,
+        composite, decay, ratio: rawRatio, Veff 
+      },
     };
   }
 
@@ -359,6 +402,21 @@
     const tier = getTierConfig(result.tier);
     const confLabel = confidenceLabel(result.confidence);
 
+    // Identify negative factors (contributing to low score)
+    const negativeFactors = [];
+    if (result.raw.A < 0.3) negativeFactors.push('Approval');
+    if (result.raw.gamma < 0.3) negativeFactors.push('Velocity');
+    if (result.raw.I < 0.3) negativeFactors.push('Integrity');
+    if (result.raw.volumeScore < 0.3) negativeFactors.push('Volume');
+    if (result.clickbaitScore > 0.3) negativeFactors.push('Clickbait');
+    if (result.raw.decay < 0.7) negativeFactors.push('Decay');
+
+    const highlightNegative = (label, value) => {
+      return negativeFactors.some(f => label.includes(f)) 
+        ? `<span style="color: #ef4444; font-weight: 600;">${label}: ${value}</span>`
+        : `<div>${label}: ${value}</div>`;
+    };
+
     const badge = document.createElement("div");
     badge.id = CONFIG.BADGE_ID;
     badge.innerHTML = `
@@ -375,12 +433,17 @@
         ${result.clickbaitScore > 0.3 ? '<span class="uf-slop-flag">⚠ Clickbait</span>' : ""}
         ${confLabel ? `<span class="uf-slop-flag">${confLabel}</span>` : ""}
         <div class="uf-badge-details">
-          <div>Approval: ${(result.raw.bayesian * 100).toFixed(1)}% → scaled ${(result.raw.A * 100).toFixed(0)}%</div>
-          <div>Velocity: ${result.raw.gamma.toFixed(3)} (V/S: ${result.raw.ratio.toFixed(2)})</div>
-          <div>Integrity: ${(result.raw.I * 100).toFixed(1)}%</div>
-          <div>Clickbait: ${(result.clickbaitScore * 100).toFixed(0)}%</div>
-          <div>Decay: ${(result.raw.decay * 100).toFixed(1)}%</div>
-          <div>Votes: ${result.raw.Veff} (${result.confidence})</div>
+          ${highlightNegative('Approval', `${(result.raw.bayesian * 100).toFixed(1)}% → ${(result.raw.A * 100).toFixed(0)}%`)}
+          ${highlightNegative('Velocity', `${result.raw.gamma.toFixed(3)} (V/S: ${result.raw.ratio.toFixed(2)})`)}
+          ${highlightNegative('Integrity', `${(result.raw.I * 100).toFixed(1)}%`)}
+          ${highlightNegative('Volume', `${(result.raw.volumeScore * 100).toFixed(0)}% (${result.raw.Veff} likes)`)}
+          ${highlightNegative('Clickbait', `${(result.clickbaitScore * 100).toFixed(0)}%`)}
+          ${highlightNegative('Decay', `${(result.raw.decay * 100).toFixed(1)}%`)}
+          <div>Engagement Velocity: ${(result.raw.engagementVelocity * 100000).toFixed(2)}</div>
+          <div>Recency Bonus: ${(result.raw.recencyBonus * 100).toFixed(0)}%</div>
+          <div style="margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.15);">
+            Votes: ${result.raw.Veff} (${result.confidence})
+          </div>
         </div>
       </div>
       <a class="uf-attribution" href="https://returnyoutubedislike.com" target="_blank" rel="noopener">
