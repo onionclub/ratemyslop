@@ -1,86 +1,83 @@
 # FODDER
 
-**The Lumina Update — A Chrome extension that scores YouTube videos 0-100 to surface expert content and filter AI slop.**
+**v4.0.0 "Clinical Precision" — A Deep-Content Auditor for the YouTube Era.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-3.0.0-30D158.svg)](https://github.com/yourusername/fodder)
+[![Version](https://img.shields.io/badge/version-4.0.0-30D158.svg)](https://github.com/yourusername/fodder)
 
 <p align="center">
-  <img src="fodderBanner.png" alt="FODDER v3 Banner" />
+  <img src="fodderBanner.png" alt="FODDER v4 Banner" />
   <br>
-  <strong>Clinical analysis of YouTube content with adaptive Lumina aesthetics.</strong><br>
-  Using independent weighted mathematics to rate internet slurry with Apple-style precision.
+  <strong>Transitioning from metadata observation to surgical content auditing.</strong><br>
+  Bypassing browser-side filters to evaluate the linguistic DNA of your feed.
 </p>
 
 ---
 
-## 🎯 What Is FODDER?
+## 🔬 The v4 "Clinical Precision" Overhaul
 
-FODDER analyzes YouTube videos using a multi-factor weighted engine and presents findings through a **satirical, clinical lens** with an **Adaptive Lumina UI** that syncs with your YouTube theme.
+FODDER v4.0 is a complete architectural reset. While v3 focused on "Lumina" aesthetics, v4 establishes the **Intelligence Sovereignty** required to surface expert signal in an ocean of AI-generated noise. This release introduces the "Pro Core"—features designed for deep-dive analysis that will form the backbone of future premium tiers.
 
-### The "Sommelier" Tier System
+### The "Clinical" Pro Suite (Early Access)
+- **Slop Density Engine v2**: A heuristic linguistic scanner that detects AI fingerprints (overuse of terms like "delve," "tapestry," and sycophantic openers). It outputs a specific **SLP %** on every video.
+- **Audience Drift**: AI-powered contrast analysis. By comparing the **Top 25** (established consensus) against the **Recent 50** (live signals), FODDER identifies sentiment decay, factual errors flagged by late viewers, or inorganic bot manipulation.
+- **Transcriptive Sovereignty**: Bypasses YouTube’s TrustedHTML and CORB security blocks by utilizing a server-side proxy (**Supadata API**) to retrieve raw, clean data for analysis.
 
-- 🟢 **ORGANIC (70-100)** — "Certified Fresh." High signal, pure content.
-- 🟡 **FILLER (40-69)** — "Edible." Processed, caloric but empty.
-- 🔴 **SYNTHETIC (0-39)** — "Bio-Hazard." AI slop detected. DO NOT CONSUME.
+
 
 ---
 
-## 🚀 The v3 "Lumina" Update
+## 🎯 Scoring & Tiering
 
-### 🎨 Visual & UX Overhaul
-- **Floating Edge Dock**: The icon now floats borderless next to the score pill for a larger, high-definition presence without cluttering the UI.
-- **Adaptive Lumina Theme**: Real-time syncing with YouTube’s internal theme. Light Mode features a frosted-glass "acrylic" material with high-contrast typography.
-- **Ghost Watermarks**: Large, 25% opacity background watermarks in the Bento Box for immediate psychological recognition of content tiers.
-- **Health Glow System**: Dynamic glows (Severe Red, Moderate Orange, Light Yellow, and Positive Green) highlight the specific metrics affecting the score.
+FODDER applies a cold, weighted lens to every video:
 
-### 📐 The Scoring Model (v3.0)
+### The Tier System
+- 🟢 **ORGANIC (70-100)** — "Certified Fresh." Pure human signal.
+- 🟡 **FILLER (40-69)** — "Edible." Processed, high-calorie filler content.
+- 🔴 **SYNTHETIC (0-39)** — "Bio-Hazard." AI-generated slurry. **DO NOT CONSUME.**
 
-FODDER uses an independent weighted formula to calculate the **Humanity Score**:
-
+### The Mathematics (v4.0)
+The **Humanity Score** is calculated through independent weighted metrics:
 $$composite = 0.45 \cdot DNA + 0.25 \cdot VEL + 0.20 \cdot INT + 0.10 \cdot VOL$$
 
-#### Components
-* **Approval DNA (45%)**: Bayesian sentiment rating calibrated to YouTube's 92-98% distribution.
-* **Growth Velocity (25%)**: Performance momentum relative to the channel's subscriber base.
-* **Signal Integrity (20%)**: Interaction density per view; our primary "bot and slop" detector.
-* **Volume Magnitude (10%)**: Raw engagement weight (logarithmic scaling of total likes).
+* **Approval DNA (45%)**: Bayesian sentiment rating calibrated to expert-level community standards.
+* **Growth Velocity (25%)**: Performance momentum relative to the channel's established base.
+* **Signal Integrity (20%)**: Interaction density; the primary detector for inorganic bot clusters.
+* **Volume Magnitude (10%)**: Logarithmic scaling of raw engagement signals.
 
 ---
 
-## 🔧 Installation
+## 🔧 Installation & Setup
 
-1. **Download/Clone** this repository.
-2. **Load in Chrome:**
-   - Navigate to `chrome://extensions/`
-   - Enable **Developer Mode**
-   - Click **Load unpacked** and select the folder.
-3. **Icons**: Ensure `icon_organic.png`, `icon_filler.png`, and `icon_synthetic.png` (and their `_light` variants) are in the root directory.
+FODDER v4.0 requires local API configuration to run the high-reasoning Clinical Suite. 
+
+1.  **Download/Clone** this repository.
+2.  **Load in Chrome:**
+    * Navigate to `chrome://extensions/`
+    * Enable **Developer Mode**.
+    * Click **Load unpacked** and select the extension folder.
+3.  **Configure API Keys (Popup Menu):**
+    * **OpenRouter API Key**: Powers "Clinical Insights" via DeepSeek V3.
+    * **YouTube Data API v3 Key**: Required for "Audience Drift" comment analysis.
+    * **Supadata API Key**: The "Sovereignty Engine" used to bypass browser transcript blocks.
 
 ---
 
-## 📊 The "Sommelier" Voice
+## 🔮 The Sommelier’s Voice
 
-FODDER uses clinical, deadpan language to describe internet content:
+FODDER maintains a satirical, clinical distance from the content it audits:
 
-### Organic (70-100)
-**Verdict:** "Certified Fresh."  
-**Detail:** "High signal, pure content detected. Safe for consumption."  
-
-### Filler (40-69)
-**Verdict:** "Edible."  
-**Detail:** "Processed, caloric but empty. Contains common additives."  
-
-### Synthetic (0-39)
-**Verdict:** "Bio-Hazard."  
-**Detail:** "AI slurry detected. Handle with extreme caution."  
-**Warning:** "DO NOT CONSUME."
+| Tier | Verdict | Clinical Detail |
+| :--- | :--- | :--- |
+| **Organic** | "Certified Fresh" | High signal, pure content detected. Safe for intellectual consumption. |
+| **Filler** | "Edible" | Processed, caloric but empty. Contains common digital additives. |
+| **Synthetic** | "Bio-Hazard" | AI slurry detected. Handle with extreme caution. **DO NOT CONSUME.** |
 
 ---
 
 ## 📄 License
-MIT License — Built for researchers, educators, and those who demand better from their feed.
+MIT License — Built for researchers, skeptics, and the clinically minded.
 
 <p align="center">
-  <strong>FODDER v3.0 — "Adaptive. Clinical. Critical."</strong>
+  <strong>FODDER v4.0 — "Sovereign. Clinical. Uncompromising."</strong>
 </p>
