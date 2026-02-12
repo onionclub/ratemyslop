@@ -1,0 +1,121 @@
+:root {
+  --f-organic: #30D158;
+  --f-filler: #FF9F0A;
+  --f-synthetic: #FF375F;
+  --f-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  
+  /* Dark Mode Defaults */
+  --f-bg: rgba(18, 18, 20, 0.98);
+  --f-text: #ffffff;
+  --f-border: rgba(255, 255, 255, 0.15);
+  --f-metric-bg: rgba(255, 255, 255, 0.06);
+  --f-shadow: rgba(0, 0, 0, 0.8);
+  --f-badge-bg: rgba(0, 0, 0, 0.85);
+  --f-badge-text: #ffffff;
+  --f-badge-weight: 800;
+  --f-badge-text-shadow: none;
+  --f-icon-shadow: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  --f-pill-shadow: 0 2px 8px var(--f-shadow);
+}
+
+/* ─── LUMINA REFINED LIGHT THEME ─── */
+body.fodder-light-theme {
+  --f-organic: #1a7f37;
+  --f-filler: #b25000;
+  --f-synthetic: #cf222e;
+  --f-bg: rgba(255, 255, 255, 0.96);
+  --f-text: #1d1d1f;
+  --f-border: rgba(0, 0, 0, 0.12);
+  --f-metric-bg: rgba(0, 0, 0, 0.04);
+  --f-shadow: rgba(0, 0, 0, 0.12);
+  --f-badge-bg: rgba(255, 255, 255, 0.95);
+  --f-badge-text: #111111;
+  /* Extra bold + 10% shadow for text legibility */
+  --f-badge-weight: 900;
+  --f-badge-text-shadow: 0 0.5px 1px rgba(0,0,0,0.1);
+  /* Icon shadow reduced by 50% from v7.1 */
+  --f-icon-shadow: drop-shadow(0 0 0.5px rgba(0,0,0,0.4)) drop-shadow(0 0.5px 1px rgba(0,0,0,0.15));
+  /* Pill shadow set to 80% of icon shadow strength */
+  --f-pill-shadow: 0 0 0.4px rgba(0,0,0,0.32), 0 0.4px 0.8px rgba(0,0,0,0.12);
+}
+
+.fodder-reset { box-sizing: border-box; line-height: normal; font-family: var(--f-font); }
+
+/* MAIN DOCK UI */
+.fodder-unified-dock {
+  display: inline-flex; align-items: center; margin-right: 14px;
+  cursor: pointer; height: 34px; vertical-align: middle;
+}
+
+.fodder-icon-dock { height: 100%; width: 42px; display: flex; align-items: center; justify-content: center; }
+.fodder-icon-dock img { 
+  width: 32px; height: 32px; object-fit: contain; 
+  filter: var(--f-icon-shadow);
+  transition: filter 0.3s ease;
+}
+
+.fodder-score-pill {
+  height: 100%; display: flex; align-items: center; gap: 8px;
+  padding: 0 14px; background: var(--f-bg);
+  border: 1px solid var(--f-border); border-radius: 8px;
+  box-shadow: var(--f-pill-shadow);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+
+.fodder-score { font-weight: 800; font-size: 17px; color: var(--f-text); }
+.fodder-label { font-weight: 700; font-size: 11px; letter-spacing: 0.5px; }
+
+.tier-organic .fodder-label { color: var(--f-organic); }
+.tier-filler .fodder-label { color: var(--f-filler); }
+.tier-synthetic .fodder-label { color: var(--f-synthetic); }
+
+/* BENTO POPUP */
+#fodder-bento-portal {
+  background: var(--f-bg); border: 1.5px solid var(--f-border);
+  border-radius: 14px; padding: 18px; 
+  box-shadow: 0 15px 50px var(--f-shadow);
+  backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+}
+
+.fodder-watermark {
+  position: absolute; top: 15%; right: -5%; width: 140px; height: 140px;
+  opacity: 0.25; pointer-events: none; z-index: 0;
+}
+
+.fodder-bento-header, .fodder-score-main, .fodder-metric-grid, .fodder-bento-footer { position: relative; z-index: 1; }
+.fodder-bento-header { display: flex; justify-content: space-between; margin-bottom: 12px; opacity: 0.5; font-size: 9px; font-weight: 900; color: var(--f-text); }
+.fodder-score-main { font-size: 42px; font-weight: 800; text-align: center; margin-bottom: 20px; color: var(--f-text); }
+
+.fodder-metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.fodder-metric { 
+  background: var(--f-metric-bg); padding: 10px 4px; border-radius: 10px; text-align: center;
+  border: 1.5px solid transparent; transition: all 0.2s ease;
+}
+.fodder-metric .label { display: block; font-size: 8px; opacity: 0.5; font-weight: 800; margin-bottom: 4px; color: var(--f-text); }
+.fodder-metric .val { display: block; font-size: 13px; font-weight: 900; color: var(--f-text); }
+
+/* DYNAMIC GLOWS */
+.glow-positive { border-color: var(--f-organic); box-shadow: 0 0 10px rgba(48, 209, 88, 0.2); }
+.glow-positive .val { color: var(--f-organic); }
+.glow-severe { border-color: var(--f-synthetic); box-shadow: 0 0 10px rgba(255, 55, 95, 0.25); }
+.glow-severe .val { color: var(--f-synthetic); }
+.glow-moderate { border-color: var(--f-filler); box-shadow: 0 0 10px rgba(255, 159, 10, 0.2); }
+.glow-moderate .val { color: var(--f-filler); }
+
+.fodder-bento-footer { font-size: 11px; opacity: 0.6; font-style: italic; text-align: center; margin-top: 15px; color: var(--f-text); }
+
+/* ─── MINI BADGE (Listing scores) ─── */
+.fodder-mini-badge {
+  position: absolute; top: 6px; left: 6px; z-index: 200; padding: 2px 6px;
+  background: var(--f-badge-bg); 
+  border: 1.5px solid; 
+  border-radius: 5px;
+  font-size: 10px; 
+  font-weight: var(--f-badge-weight); 
+  color: var(--f-badge-text);
+  text-shadow: var(--f-badge-text-shadow);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.fodder-mini-badge.tier-organic { border-color: var(--f-organic); }
+.fodder-mini-badge.tier-filler { border-color: var(--f-filler); }
+.fodder-mini-badge.tier-synthetic { border-color: var(--f-synthetic); }

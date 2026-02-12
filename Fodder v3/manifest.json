@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Fodder",
+  "version": "7.2.0",
+  "description": "Lumina Refined: High-definition light mode with improved legibility and subtle definition.",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://www.youtube.com/*",
+    "https://returnyoutubedislikeapi.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*"],
+      "js": ["content_script.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icon_organic.png", "icon_filler.png", "icon_synthetic.png",
+        "icon_organic_light.png", "icon_filler_light.png", "icon_synthetic_light.png"
+      ],
+      "matches": ["https://www.youtube.com/*"]
+    }
+  ],
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
